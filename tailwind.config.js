@@ -23,6 +23,9 @@ module.exports = {
         medium: 'Roboto_500Medium',
         bold: 'Roboto_700Bold',
         extrabold: 'Roboto_900Black'
+      },
+      backgroundImage: {
+        'signin-img': "url('./src/assets/bg-sign-img.jpg')"
       }
     },
   },

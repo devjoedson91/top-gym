@@ -6,8 +6,9 @@ import {
   Roboto_700Bold,
   Roboto_900Black,
 } from "@expo-google-fonts/roboto";
+import { NavigationContainer } from "@react-navigation/native";
 import { Loading } from "./src/components/Loading";
-import { Home } from "./src/screens/Home";
+import Routes from "./src/routes";
 
 export default function App() {
   const [fontsLoaded] = useFonts({
@@ -22,13 +23,15 @@ export default function App() {
   }
 
   return (
-    <>
-      <Home />
-      <StatusBar
-        barStyle="light-content"
-        backgroundColor="transparent"
-        translucent
-      />
-    </>
+    
+     <NavigationContainer>
+         <Routes />
+         <StatusBar
+            barStyle="light-content"
+            backgroundColor="transparent"
+            translucent
+        />
+     </NavigationContainer> 
+   
   );
 }
