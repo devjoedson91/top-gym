@@ -3,11 +3,16 @@ import { LinearGradient } from "expo-linear-gradient";
 import { Barbell } from "phosphor-react-native";
 import { BackgroundPage } from "../components/BackgroundPage";
 import { useNavigation } from "@react-navigation/native";
-import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 
-export function SignIn() {
+export function SignUp() {
 
-    const navigation = useNavigation<NativeStackNavigationProp<StackParamList>>();
+    const navigation = useNavigation();
+
+    async function handleSignUp() {
+
+        navigation.goBack();
+
+    }
 
     return (
         <SafeAreaView className="flex-1 bg-background">
@@ -19,7 +24,12 @@ export function SignIn() {
                         <Text className="font-medium text-white text-base">Treine sua mente e seu corpo</Text>
                     </View>
                     <View className="w-full flex items-center gap-5">
-                        <Text className="text-white text-lg font-medium">Acesse sua conta</Text>
+                        <Text className="text-white text-lg font-medium">Crie sua conta</Text>
+                        <TextInput 
+                            className="w-full bg-background p-3 font-regular text-base rounded-md text-white"
+                            placeholder="Nome"
+                            placeholderTextColor="#7C7C8A"
+                        />
                         <TextInput 
                             className="w-full bg-background p-3 font-regular text-base rounded-md text-white"
                             placeholder="E-mail"
@@ -33,19 +43,19 @@ export function SignIn() {
                         />
                         <TouchableOpacity 
                             className="flex justify-center items-center rounded-md bg-green_700 py-3 w-full" 
-                            activeOpacity={0.8}
+                            activeOpacity={0.8} 
+                            onPress={() => handleSignUp()}
                         >
-                            <Text className="text-white text-lg font-medium">Acessar</Text>
+                            <Text className="text-white text-lg font-medium">Criar e acessar</Text>
                         </TouchableOpacity>
                     </View>
                     <View className="w-full flex items-center gap-4">
-                        <Text className="text-white text-base font-regular">Ainda não tem acesso?</Text>
                         <TouchableOpacity 
                             className="flex justify-center items-center rounded-md border-2 border-green_700 bg-transparent py-3 w-full" 
-                            activeOpacity={0.8}
-                            onPress={() => navigation.navigate('SignUp')}
+                            activeOpacity={0.8} 
+                            onPress={() => navigation.goBack()}
                         >
-                            <Text className="text-white text-lg font-medium">Criar conta</Text>
+                            <Text className="text-white text-lg font-medium">Voltar para o login</Text>
                         </TouchableOpacity>
                     </View>
                 </View>
