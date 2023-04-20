@@ -3,7 +3,7 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { SignIn } from "../screens/SignIn";
 import { SignUp } from "../screens/SignUp";
 
-const Stack = createNativeStackNavigator<StackParamList>();
+const Stack = createNativeStackNavigator<CredentialsParamsList>();
 
 export default function AuthRoutes() {
     return (

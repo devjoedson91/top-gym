@@ -1,4 +1,4 @@
 type StackParamList = {
-    SignIn: undefined;
-    SignUp: undefined;
+    Home: undefined;
+    Details: undefined;
 }

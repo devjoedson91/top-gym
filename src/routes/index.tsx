@@ -1,9 +1,11 @@
 import AuthRoutes from "./auth.routes";
 import AppRoutes from "./app.routes";
+import { useContext } from "react";
+import { AuthContext } from "../contexts/AuthContext";
 
 export default function Routes() {
 
-    let isAuthenticated = false;
+    const { isAuthenticated } = useContext(AuthContext);
 
     return (
         isAuthenticated ? <AppRoutes /> : <AuthRoutes />

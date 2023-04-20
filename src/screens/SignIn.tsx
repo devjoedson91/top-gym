@@ -1,13 +1,23 @@
+import { useContext } from "react";
 import { SafeAreaView, Text, View, TextInput, TouchableOpacity } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { Barbell } from "phosphor-react-native";
 import { BackgroundPage } from "../components/BackgroundPage";
 import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { AuthContext } from "../contexts/AuthContext";
 
 export function SignIn() {
 
-    const navigation = useNavigation<NativeStackNavigationProp<StackParamList>>();
+    const navigation = useNavigation<NativeStackNavigationProp<CredentialsParamsList>>();
+
+    const { signIn } = useContext(AuthContext);
+
+    function handleLogin() {
+
+        signIn();
+
+    }
 
     return (
         <SafeAreaView className="flex-1 bg-background">
@@ -34,6 +44,7 @@ export function SignIn() {
                         <TouchableOpacity 
                             className="flex justify-center items-center rounded-md bg-green_700 py-3 w-full" 
                             activeOpacity={0.8}
+                            onPress={() => handleLogin()}
                         >
                             <Text className="text-white text-lg font-medium">Acessar</Text>
                         </TouchableOpacity>

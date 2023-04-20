@@ -8,6 +8,7 @@ module.exports = {
     extend: {
       colors: {
         background: '#121214',
+        secondary: '#202024',
         green_700: '#00875F',
         green_500: '#00B37E',
         gray_600: '#202024',
@@ -24,9 +25,6 @@ module.exports = {
         bold: 'Roboto_700Bold',
         extrabold: 'Roboto_900Black'
       },
-      backgroundImage: {
-        'signin-img': "url('./src/assets/bg-sign-img.jpg')"
-      }
     },
   },
   plugins: [],
