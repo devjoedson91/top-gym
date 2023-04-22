@@ -8,9 +8,26 @@ export function StackRoutes() {
 
     return (
         <Stack.Navigator>
-            <Stack.Screen name="Home" component={Home} options={{headerShown: false}} />
+            <Stack.Screen 
+                name="Home" 
+                component={Home} 
+                options={{
+                    headerStyle: {
+                        backgroundColor: "#202024",
+                    },
+                    headerTintColor: "#fff",
+                }} 
+            />
             <Stack.Screen name="Details" component={Details} options={{headerShown: false}} />
         </Stack.Navigator>
     );
 
 }
+
+// headerStyle: {
+//     backgroundColor: '#202024',
+//     elevation: 0,
+//     shadowOpacity: 0,
+//     borderBottomWidth: 0,
+//     height: 120
+// },

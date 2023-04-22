@@ -29,9 +29,9 @@ export default function App() {
         <AuthProvider>
             <Routes />
             <StatusBar
-                barStyle="light-content"
-                backgroundColor="transparent"
-                translucent
+                // barStyle="light-content"
+                // backgroundColor="transparent"
+                // translucent
             />
         </AuthProvider>
      </NavigationContainer> 

@@ -11,13 +11,7 @@ export default function AppRoutes() {
     return (
         <Tab.Navigator
             screenOptions={{
-                headerStyle: {
-                    backgroundColor: '#202024',
-                    elevation: 0,
-                    shadowOpacity: 0,
-                    borderBottomWidth: 0,
-                    height: 120
-                },
+                headerShown: false,
                 headerTintColor: '#fff',
                 tabBarHideOnKeyboard: true, // a tab bar nao vai ficar por cima do teclado
                 tabBarShowLabel: false,
