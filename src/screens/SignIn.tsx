@@ -1,5 +1,5 @@
-import { useContext } from "react";
-import { SafeAreaView, Text, View, TextInput, TouchableOpacity } from "react-native";
+import { useContext, useState } from "react";
+import { SafeAreaView, Text, View, TextInput, TouchableOpacity, ActivityIndicator } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { Barbell } from "phosphor-react-native";
 import { BackgroundPage } from "../components/BackgroundPage";
@@ -11,11 +11,16 @@ export function SignIn() {
 
     const navigation = useNavigation<NativeStackNavigationProp<CredentialsParamsList>>();
 
-    const { signIn } = useContext(AuthContext);
+    const { signIn, loadingAuth } = useContext(AuthContext);
 
-    function handleLogin() {
+    const [email, setEmail] = useState("");
+    const [password, setPassword] = useState("");
 
-        signIn();
+    async function handleLogin() {
+
+        // if (email === '' || password === '') return;
+
+        await signIn({ email, password });
 
     }
 
@@ -33,20 +38,31 @@ export function SignIn() {
                         <TextInput 
                             className="w-full bg-background p-3 font-regular text-base rounded-md text-white"
                             placeholder="E-mail"
-                            placeholderTextColor="#7C7C8A"
+                            placeholderTextColor="#7C7C8A" 
+                            value={email}
+                            onChangeText={setEmail}
                         />
                         <TextInput 
                              className="w-full bg-background p-3 font-regular text-base rounded-md text-white"
                              placeholder="Senha"
                              placeholderTextColor="#7C7C8A"
-                             secureTextEntry={true}
+                             secureTextEntry={true} 
+                             value={password}
+                             onChangeText={setPassword}
                         />
                         <TouchableOpacity 
                             className="flex justify-center items-center rounded-md bg-green_700 py-3 w-full" 
                             activeOpacity={0.8}
                             onPress={() => handleLogin()}
                         >
-                            <Text className="text-white text-lg font-medium">Acessar</Text>
+                            {
+                                loadingAuth ? (
+                                    <ActivityIndicator size={25} color="#fff" />
+                                ) : (
+                                    <Text className="text-white text-lg font-medium">Acessar</Text>
+                                )
+                            }
+                            
                         </TouchableOpacity>
                     </View>
                     <View className="w-full flex items-center gap-4">
