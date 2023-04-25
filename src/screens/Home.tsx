@@ -1,12 +1,15 @@
-import { useLayoutEffect } from "react";
+import { useContext, useLayoutEffect } from "react";
 import { Pressable, Text, View, Image, FlatList, TouchableOpacity, SafeAreaView } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { SignOut } from "phosphor-react-native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { AuthContext } from "../contexts/AuthContext";
 
 export function Home() {
 
     const navigation = useNavigation<NativeStackNavigationProp<TabParamsList>>();
+
+    const { signOut } = useContext(AuthContext);
 
     useLayoutEffect(() => {
 
@@ -23,7 +26,7 @@ export function Home() {
                             <Text className="text-white font-bold text-base">Joedson Ferreira</Text>
                         </View>                   
                     </View>
-                    <Pressable>
+                    <Pressable onPress={signOut}>
                         <SignOut size={32} color="#fff" />
                     </Pressable>
                 </View>

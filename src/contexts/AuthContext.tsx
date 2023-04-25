@@ -6,6 +6,7 @@ type AuthContextData = {
     loadingAuth: boolean;
     isAuthenticated: boolean;
     signIn: (credentials: SignInProps) => Promise<void>;
+    signOut: () => Promise<void>;
 }
 
 type AuthProviderProps = {
@@ -76,8 +77,21 @@ export function AuthProvider({ children }: AuthProviderProps) {
         }
     }
 
+    async function signOut() {
+
+        const response = await api.post('/v1/logout');
+
+        const { msg } = response.data;
+
+        alert(msg);
+
+		await AsyncStorage.clear().then(() => {
+			setUser({ token: '' });
+		});
+	}
+
     return (
-        <AuthContext.Provider value={{ isAuthenticated, loadingAuth, signIn }}>
+        <AuthContext.Provider value={{ isAuthenticated, loadingAuth, signIn, signOut }}>
             { children }
         </AuthContext.Provider>
     );
