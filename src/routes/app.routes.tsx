@@ -19,7 +19,7 @@ export default function AppRoutes() {
                 tabBarStyle: {
                     backgroundColor: '#202024',
                     borderTopWidth: 0,
-                    height: 80
+                    height: 80,
                 }
             }}
         >

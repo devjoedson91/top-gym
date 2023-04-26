@@ -18,7 +18,16 @@ export function StackRoutes() {
                     headerTintColor: "#fff",
                 }} 
             />
-            <Stack.Screen name="Details" component={Details} options={{headerShown: false}} />
+            <Stack.Screen 
+                name="Details" 
+                component={Details} 
+                options={{
+                    headerStyle: {
+                        backgroundColor: "#202024",
+                    },
+                    headerTintColor: "#fff",
+                }}  
+            />
         </Stack.Navigator>
     );
 
