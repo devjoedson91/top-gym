@@ -36,14 +36,14 @@ export function SignIn() {
                     <View className="w-full flex items-center gap-5">
                         <Text className="text-white text-lg font-medium">Acesse sua conta</Text>
                         <TextInput 
-                            className="w-full bg-background p-3 font-regular text-base rounded-md text-white"
+                            className="w-full bg-gray_500 p-3 font-regular text-base rounded-md text-white"
                             placeholder="E-mail"
                             placeholderTextColor="#7C7C8A" 
                             value={email}
                             onChangeText={setEmail}
                         />
                         <TextInput 
-                             className="w-full bg-background p-3 font-regular text-base rounded-md text-white"
+                             className="w-full bg-gray_500 p-3 font-regular text-base rounded-md text-white"
                              placeholder="Senha"
                              placeholderTextColor="#7C7C8A"
                              secureTextEntry={true} 
