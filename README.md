@@ -53,6 +53,7 @@ Concluído
 ## Back end
 - PHP
 - Laravel
+- Mysql
 
 ## Front end web
 Pré-requisitos: npm/yarn / node / expo-cli
