@@ -5,9 +5,9 @@
 
 Aplicativo para montagem e acompanhamento de treino de musculação.
 
-## Em Conclusão
+## Status
 
-Concluído
+Em Conclusão
 
 ## Funcionalidades
 
