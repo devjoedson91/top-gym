@@ -20,7 +20,7 @@ export function CheckBox({ checked = false, ...rest }: Props) {
                         <Check size={25} color={colors.white} />
                     </View>
                 ) : (
-                    <View className="w-8 h-8 bg-gray_500 rounded-lg" />
+                    <View className="w-8 h-8 bg-gray_600 rounded-lg" />
                 )
             }
         </TouchableOpacity>
