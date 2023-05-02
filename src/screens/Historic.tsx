@@ -129,9 +129,8 @@ export function Historic() {
             <View className="w-full justify-around flex-row mt-6 mb-3">
                {
                   weekDays.map((weekDay, i) => (
-                     <View className="flex-col">
+                     <View className="flex-col" key={`${weekDay}-${i}`}>
                         <Text
-                            key={`${weekDay}-${i}`}
                             className="text-gray_200 text-xl font-bold text-center mx-1 mb-2"
                         >
                             {weekDay}

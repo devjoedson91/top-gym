@@ -1,5 +1,5 @@
 import { useLayoutEffect, useState } from "react";
-import { Text, View, SafeAreaView, Pressable, Image, Modal, TextInput } from "react-native";
+import { Text, View, SafeAreaView, Pressable, Image, Modal, TextInput, KeyboardAvoidingView, Platform, ScrollView } from "react-native";
 import { RouteProp, useRoute, useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { Header } from "../components/Header";
@@ -68,73 +68,79 @@ export function Details() {
     }
 
     return (
-        <SafeAreaView className="bg-background flex-1 p-4">
-            <Pressable onPress={handleOpenVideo}>
-                <View className="absolute z-[9] top-0 left-0 right-0 bottom-0 items-center justify-center">
-                    <Play size={40} color="#fafafa" />
-                </View>
-                <Image source={{uri: route.params?.cover}} className="w-full h-56 rounded-lg"/>
-            </Pressable>
+        <KeyboardAvoidingView 
+            className="bg-background flex-1 p-4" 
+            behavior={Platform.OS == 'ios' ? 'padding' : 'height'}
+            // keyboardVerticalOffset={}
+        >
+            <ScrollView>
+                <Pressable onPress={handleOpenVideo}>
+                    <View className="absolute z-[9] top-0 left-0 right-0 bottom-0 items-center justify-center">
+                        <Play size={40} color="#fafafa" />
+                    </View>
+                    <Image source={{uri: route.params?.cover}} className="w-full h-52 rounded-lg"/>
+                </Pressable>
 
-            <View className="w-full justify-around flex-row mt-4 mb-3">
-               {
-                  weekDays.map((weekDay, i) => (
-                     <View 
-                        className="flex-col"
-                        key={`${weekDay}-${i}`}
-                     >
-                        <Text
-                            className="text-gray_200 text-xl font-bold text-center mx-1 mb-2"
+                <View className="w-full justify-around flex-row mt-4 mb-3">
+                {
+                    weekDays.map((weekDay, i) => (
+                        <View 
+                            className="flex-col"
+                            key={`${weekDay}-${i}`}
                         >
-                            {weekDay}
-                        </Text>
-                        <CheckBox 
-                            checked={days.includes(i)} 
-                            onPress={() => handleToggleWeekDay(i)} 
-                        />
-                     </View>
-                  ))
-               }
-            </View>
+                            <Text
+                                className="text-gray_200 text-xl font-bold text-center mx-1 mb-2"
+                            >
+                                {weekDay}
+                            </Text>
+                            <CheckBox 
+                                checked={days.includes(i)} 
+                                onPress={() => handleToggleWeekDay(i)} 
+                            />
+                        </View>
+                    ))
+                }
+                </View>
 
-            <View className="flex-row items-center gap-4 mb-5">
-                <Barbell size={32} color="#00875F" />
-                <TextInput 
-                    className="w-14 bg-gray_500 p-1 font-regular text-base rounded-md text-white" 
-                    keyboardType="numeric"
+                <View className="flex-row items-center gap-4 mb-5">
+                    <Barbell size={32} color="#00875F" />
+                    <TextInput 
+                        className="w-14 bg-gray_500 p-1 font-regular text-base rounded-md text-white" 
+                        keyboardType="numeric"
+                    />
+                    <Text className="text-white font-medium">Séries</Text>
+                </View>
+
+                <View className="flex-row items-center gap-4 mb-5">
+                    <Repeat size={32} color="#00875F" />
+                    <TextInput 
+                        className="w-14 bg-gray_500 p-1 font-regular text-base rounded-md text-white" 
+                        keyboardType="numeric"
+                    />
+                    <Text className="text-white font-medium">Repetições</Text>
+                </View>
+
+                <View className="flex-row items-center gap-4 mb-5">
+                    <AlignCenterHorizontal size={32} color="#00875F" />
+                    <TextInput 
+                        className="w-14 bg-gray_500 p-1 font-regular text-base rounded-md text-white" 
+                        keyboardType="numeric"
+                    />
+                    <Text className="text-white font-medium">Carga (kg)</Text>
+                </View>
+
+                <Button 
+                    action={() => handleSaveExercise(route.params?.id)} 
+                    title="Adicionar exercício"
                 />
-                <Text className="text-white font-medium">Séries</Text>
-            </View>
-
-            <View className="flex-row items-center gap-4 mb-5">
-                <Repeat size={32} color="#00875F" />
-                <TextInput 
-                    className="w-14 bg-gray_500 p-1 font-regular text-base rounded-md text-white" 
-                    keyboardType="numeric"
-                />
-                <Text className="text-white font-medium">Repetições</Text>
-            </View>
-
-            <View className="flex-row items-center gap-4 mb-5">
-                <AlignCenterHorizontal size={32} color="#00875F" />
-                <TextInput 
-                    className="w-14 bg-gray_500 p-1 font-regular text-base rounded-md text-white" 
-                    keyboardType="numeric"
-                />
-                <Text className="text-white font-medium">Carga (kg)</Text>
-            </View>
-
-            <Button 
-                action={() => handleSaveExercise(route.params?.id)} 
-                title="Adicionar exercício"
-            />
-
-            <Modal visible={showVideo} animationType="slide">
-                <VideoView 
-                    handleClose={() => setShowVideo(false)}
-                    videoUrl={route.params?.video}
-                />
-            </Modal>
-        </SafeAreaView>
+                
+                <Modal visible={showVideo} animationType="slide">
+                    <VideoView 
+                        handleClose={() => setShowVideo(false)}
+                        videoUrl={route.params?.video}
+                    />
+                </Modal>
+            </ScrollView>
+        </KeyboardAvoidingView>
     );
 }
