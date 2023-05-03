@@ -1,8 +1,9 @@
 type ExerciseDetailProps = {
-    id: number | string;
+    id: number;
     name: string;
     cover: string;
     video: string | null;
+    category: string | undefined;
 }
 
 type StackParamList = {

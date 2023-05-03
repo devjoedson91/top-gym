@@ -3,5 +3,5 @@ interface ExercisesProps {
     name: string;
     cover: string;
     video: string;
-    category_id: string;
+    category_id: string | undefined;
 }

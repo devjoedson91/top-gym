@@ -137,7 +137,7 @@ export function Home() {
                         <TouchableOpacity 
                             className="bg-gray_500 mb-3 w-full h-[120px] py-3 rounded-lg flex flex-row items-center justify-around"
                             key={item.id} 
-                            onPress={() => handleNavigate(item)}
+                            onPress={() => handleNavigate({...item, category: muscleSelected?.name})}
                         >
                             {
                                 item.cover ? (
