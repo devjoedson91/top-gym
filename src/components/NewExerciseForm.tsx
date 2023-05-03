@@ -3,8 +3,10 @@ import { View, Text, TextInput } from "react-native";
 import { CheckBox } from "./CheckBox";
 import { Barbell, Repeat, AlignCenterHorizontal } from "phosphor-react-native";
 import { useForm } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
 import { ControlledInput } from "./ControlledInput";
 import { Button } from "./Button";
+import * as yup from "yup";
 
 const weekDays = ['D', 'S', 'T', 'Q', 'Q', 'S', 'S'];
 
@@ -14,9 +16,21 @@ type FormData = {
     load: number;
 }
 
-export function NewExerciseForm() {
+type NewExerciseFormProps = {
+    exercise_id: number;
+    user_id: number;
+}
 
-    const { control, handleSubmit } = useForm<FormData>();
+const schema = yup.object({
+    amount_series: yup.number().required('Informe a quantidade de séries do exercício'),
+    amount_repeat: yup.number().required('Informe a quantidade de repetições do exercício'),
+});
+
+export function NewExerciseForm({ exercise_id, user_id }: NewExerciseFormProps) {
+
+    const { control, handleSubmit } = useForm<FormData>({
+        resolver: yupResolver(schema)
+    });
 
     const [days, setDays] = useState<number[]>([]);
 
@@ -32,7 +46,9 @@ export function NewExerciseForm() {
 
     function handleExerciseRegister(data: FormData) {
 
-        console.log(data);
+        const exerciseData = {...data, week_day: days, exercise_id, user_id};
+
+        console.log(exerciseData);
 
     }
 

@@ -60,7 +60,7 @@ export function Details() {
                     <Image source={{uri: route.params?.cover}} className="w-full h-52 rounded-lg"/>
                 </Pressable>
 
-                <NewExerciseForm />
+                <NewExerciseForm exercise_id={route.params?.id} user_id={1} />
                 
                 <Modal visible={showVideo} animationType="slide">
                     <VideoView 

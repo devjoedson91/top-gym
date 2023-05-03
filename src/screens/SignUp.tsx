@@ -3,6 +3,14 @@ import { LinearGradient } from "expo-linear-gradient";
 import { Barbell } from "phosphor-react-native";
 import { BackgroundPage } from "../components/BackgroundPage";
 import { useNavigation } from "@react-navigation/native";
+import * as yup from "yup";
+
+const schema = yup.object({
+    name: yup.string().required('Informe o seu nome'),
+    email: yup.string().email('E-mail inválido').required('Informe o e-mail'),
+    password: yup.string().min(4, 'A senha deve ter ao menos 6 digitos').required('Informe senha'),
+    // password_confirm: yup.string().oneOf([yup.ref('password')], 'A senha de confirmação não confere')
+});
 
 export function SignUp() {
 
