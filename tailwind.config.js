@@ -17,7 +17,8 @@ module.exports = {
         gray_300: '#7C7C8A',
         gray_200: '#C4C4CC',
         gray_100: '#E1E1E6',
-        white: '#ffffff'
+        white: '#ffffff',
+        red_default: '#DC1637'
       },
       fontFamily: {
         regular: 'Roboto_400Regular',

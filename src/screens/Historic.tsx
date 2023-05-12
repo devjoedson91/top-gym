@@ -1,105 +1,24 @@
-import { useLayoutEffect, useState } from "react";
-import { View, Text, SafeAreaView, ScrollView, TouchableOpacity, Pressable } from "react-native";
+import { useEffect, useLayoutEffect, useState } from "react";
+import { View, Text, SafeAreaView, ScrollView, TouchableOpacity, Pressable, Alert } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { CheckBox } from "../components/CheckBox";
-import { Barbell, Repeat, Trash } from "phosphor-react-native";
+import { Barbell, Repeat, Trash, Person } from "phosphor-react-native";
 import colors from "tailwindcss/colors";
+import api from "../services/api";
+import { Loading } from "../components/Loading";
 
 const weekDays = ['D', 'S', 'T', 'Q', 'Q', 'S', 'S'];
-
-const trainnings = [
-    {
-        id: 1,
-        name: "Costas",
-        exercises: [
-            {
-                id: 1,
-                name: "Puxada frontal",
-                training: [
-                    {
-                        id: 1,
-                        week_day: 1,
-                        amount_series: 4,
-                        amount_repeat: 12
-                    }
-                ]
-            },
-            {
-                id: 2,
-                name: "Remada curvada",
-                training: [
-                    {
-                        id: 1,
-                        week_day: 1,
-                        amount_series: 4,
-                        amount_repeat: 12
-                    }
-                ]
-            },
-            {
-                id: 3,
-                name: "Remada unilateral",
-                training: [
-                    {
-                        id: 1,
-                        week_day: 1,
-                        amount_series: 4,
-                        amount_repeat: 12
-                    }
-                ]
-            }
-        ]
-    },
-    {
-        id: 2,
-        name: "Bíceps",
-        exercises: [
-            {
-                id: 4,
-                name: "Rosca direta",
-                training: [
-                    {
-                        id: 1,
-                        week_day: 1,
-                        amount_series: 4,
-                        amount_repeat: 12
-                    }
-                ]
-            },
-            {
-                id: 5,
-                name: "Rosca martelo",
-                training: [
-                    {
-                        id: 1,
-                        week_day: 1,
-                        amount_series: 4,
-                        amount_repeat: 12
-                    }
-                ]
-            },
-            {
-                id: 6,
-                name: "Alternados",
-                training: [
-                    {
-                        id: 1,
-                        week_day: 1,
-                        amount_series: 4,
-                        amount_repeat: 12
-                    }
-                ]
-            }
-        ]
-    }      
-];
 
 export function Historic() {
 
     const navigation = useNavigation<NativeStackNavigationProp<TabParamsList>>();
 
-    const [days, setDays] = useState<number[]>([]);
+    const [days, setDays] = useState<number[]>([1]);
+
+    const [trainings, setTrainings] = useState<TrainingsProps[]>([]);
+    const [categories, setCategories] = useState<string[]>([]);
+    const [loading, setLoading] = useState(false);
 
     useLayoutEffect(() => {
 
@@ -114,13 +33,76 @@ export function Historic() {
 
     }, [navigation]);
 
+    useEffect(() => {
+
+        loadTrainings();
+
+    }, [days]);
+
+    async function loadTrainings() {
+
+        setLoading(true);
+
+        try {
+
+            const response = await api.get('/v1/trainings/1');
+
+            const filterTraining = response.data.filter((training: TrainingsProps ) => {
+
+                return training.day_week === days[0];
+
+            });
+
+            const keys = filterTraining.map((key: TrainingsProps) => {
+
+                return key.category;
+
+            });
+
+            setCategories(Array.from(new Set(keys)));
+
+            setTrainings(filterTraining);
+
+            setLoading(false);
+
+        } catch(err) {
+
+            Alert.alert('Erro ao carregar treinos: '+err);
+            console.log(err);
+            setLoading(false);
+
+        }
+
+    }
+
     function handleToggleWeekDay(weekDayIndex: number) {
 
-        if (days.includes(weekDayIndex)) { // para desmarcar
-            setDays(prevState => prevState.filter(weekDay => weekDay !== weekDayIndex))
-        } else { // para marcar
-            setDays(prevState => [weekDayIndex]);
+        setDays(prevState => [weekDayIndex]);
+
+    }
+
+    async function handlePutAsCompleted(training_id: number, is_completed: boolean) {
+
+        setLoading(true);
+
+        try {
+
+            await api.patch(`/v1/trainings/${training_id}`, {
+                is_completed: !is_completed
+            });
+
+            loadTrainings();
+
+            setLoading(false);
+
+        } catch(err) {
+
+            setLoading(false);
         }
+
+    }
+
+    function handlePutAsDeleted(training_id: number) {
 
     }
 
@@ -143,57 +125,70 @@ export function Historic() {
                   ))
                }
             </View>
-            <ScrollView
-                showsVerticalScrollIndicator={false}
-                contentContainerStyle={{ paddingBottom: 100 }}
-            >
-                {
-                    trainnings.map((trainning, i) => (
-
-                        <View className="mb-3" key={`${i}-${trainning.name}`}>
-                            <Text className="text-white font-medium text-base mb-3">
-                                {trainning.name}
-                            </Text>
-                            {
-                                trainning.exercises.map((exercise, i) => (
-                                    <TouchableOpacity 
-                                        className="bg-gray_500 mb-3 w-full h-[120px] p-3 rounded-lg flex flex-row items-center justify-between" 
-                                        key={`${i}-${exercise.name}`}
-                                    >
-                                        <View>
-                                            <Text className="text-white font-medium text-lg mb-4">
-                                                {exercise.name}
-                                            </Text>
-                                            <View className="flex flex-row gap-2 items-center">
-                                                <Barbell size={32} color="#00875F" />
-                                                <Text className="text-white font-medium">
-                                                    {
-                                                        exercise.training.map(item => `${item.amount_series} séries`)
-                                                    }    
+            {
+                loading ? <Loading /> :
+                categories.length === 0 ? 
+                <View className="flex-1 flex items-center justify-center">
+                    <Text className="text-white">NÃO HÁ TREINO PARA ESSE DIA</Text>
+                </View> : 
+                <ScrollView
+                    showsVerticalScrollIndicator={false}
+                    contentContainerStyle={{ paddingBottom: 100 }}
+                >
+                    {
+                        categories.map((category, i) => (
+                            <View className="mb-3" key={`${i}-${category}`}>
+                                <View className="flex flex-row gap-2">
+                                    <Text className="text-white font-medium text-base mb-3">
+                                        {category}
+                                    </Text>
+                                    <Person size={20} color="#C4C4CC" />
+                                </View>
+                                {
+                                    trainings.map((training, i) => (
+                                        training.category === category &&
+                                        <TouchableOpacity 
+                                            className="bg-gray_500 mb-3 w-full p-3 rounded-lg flex flex-row items-center justify-between" 
+                                            key={`${training.training_id}`}
+                                        >
+                                            <View>
+                                                <Text className="text-green_500 font-medium text-lg mb-3">
+                                                    {training.name}
                                                 </Text>
-                                                <Repeat size={32} color="#00875F" />
-                                                <Text className="text-white font-medium">
+                                                <View className="flex flex-row gap-3 items-center mb-3">
+                                                    <Barbell size={32} color="#00875F" />
+                                                    <Text className="text-white font-medium">
+                                                        {
+                                                            `${training.amount_series} séries`
+                                                        }    
+                                                    </Text>
+                                                    <Repeat size={32} color="#00875F" />
+                                                    <Text className="text-white font-medium">
                                                     {
-                                                        exercise.training.map(item => `${item.amount_repeat} repetições`)
+                                                        `${training.amount_repeat} rept`
                                                     }  
-                                                </Text>
+                                                    </Text>
+                                                </View>
+                                                <View className="flex flex-row gap-3 items-center">
+                                                    <CheckBox 
+                                                        checked={training.is_completed}
+                                                        onPress={() => handlePutAsCompleted(training.training_id, training.is_completed)}
+                                                    />
+                                                    <Text className="text-white font-medium text-base">Marcar como concluído</Text>
+                                                </View>
                                             </View>
-                                        </View>
-                                        <View className="flex items-center gap-2">
-                                            <CheckBox checked={true} />
-                                            <Pressable>
+                                            <Pressable onPress={() => handlePutAsDeleted(training.training_id)}>
                                                 <Trash size={38} color={colors.red['500']} />
                                             </Pressable>
-                                        </View>
-                                    </TouchableOpacity>
-                                ))
-                            }
-                        </View>
-
-                    ))
-                }
-            
-            </ScrollView>
+                                        </TouchableOpacity>
+                                    ))
+                                }
+                            </View>
+                        ))
+                    }
+                
+                </ScrollView>
+            }
         </SafeAreaView>
     );
 }

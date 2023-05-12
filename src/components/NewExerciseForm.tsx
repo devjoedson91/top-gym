@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { View, Text, TextInput } from "react-native";
+import { View, Text, Alert } from "react-native";
 import { CheckBox } from "./CheckBox";
 import { Barbell, Repeat, AlignCenterHorizontal } from "phosphor-react-native";
 import { useForm } from "react-hook-form";
@@ -7,6 +7,9 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import { ControlledInput } from "./ControlledInput";
 import { Button } from "./Button";
 import * as yup from "yup";
+import api from "../services/api";
+import { Loading } from "./Loading";
+import { useNavigation } from "@react-navigation/native";
 
 const weekDays = ['D', 'S', 'T', 'Q', 'Q', 'S', 'S'];
 
@@ -22,17 +25,22 @@ type NewExerciseFormProps = {
 }
 
 const schema = yup.object({
-    amount_series: yup.number().required('Informe a quantidade de séries do exercício'),
-    amount_repeat: yup.number().required('Informe a quantidade de repetições do exercício'),
+    amount_series: yup.number().transform((value) => (isNaN(value) || value === null || value === undefined) ? 1 : value).min(1).required('Informe a quantidade de séries'),
+    amount_repeat: yup.number().transform((value) => (isNaN(value) || value === null || value === undefined) ? 1 : value).min(1).required('Informe a quantidade de repetições'),
+    load: yup.number().transform((value) => (isNaN(value) || value === null || value === undefined) ? 1 : value).min(1)
 });
 
 export function NewExerciseForm({ exercise_id, user_id }: NewExerciseFormProps) {
 
-    const { control, handleSubmit } = useForm<FormData>({
+    const navigate = useNavigation();
+
+    const { control, handleSubmit, formState: { errors } } = useForm<FormData>({
         resolver: yupResolver(schema)
     });
 
     const [days, setDays] = useState<number[]>([]);
+
+    const [loading, setLoading] = useState(false);
 
     function handleToggleWeekDay(weekDayIndex: number) {
 
@@ -46,15 +54,49 @@ export function NewExerciseForm({ exercise_id, user_id }: NewExerciseFormProps) 
 
     function handleExerciseRegister(data: FormData) {
 
-        const exerciseData = {...data, week_day: days, exercise_id, user_id};
+        if (days.length === 0) {
 
-        console.log(exerciseData);
+            Alert.alert('Para concluir, você deve selecionar ao menos um dia da semana.');
+            return;
+        }
+
+        setLoading(true);
+
+        try {
+
+            days.forEach(async (day: number) => {
+
+                await api.post('/v1/trainings', {
+                    exercise_id,
+                    user_id,
+                    amount_series: data.amount_series,
+                    amount_repeat: data.amount_repeat,
+                    load: data.load,
+                    day_week: day
+                })
+    
+            });
+
+            Alert.alert('Exercício adicionado com sucesso!');
+            setLoading(false);
+            navigate.goBack();
+
+
+        } catch(err) {
+            Alert.alert('Erro ao cadastrar exercício '+err);
+            console.log('Erro ao cadastrar treino: ', err);
+            setLoading(false);
+        } 
 
     }
 
+    if (loading) {
+        return <Loading />;
+    }
+
     return (
-        <View>
-            <View className="w-full justify-around flex-row mt-4 mb-3">
+        <View className="w-full flex flex-col px-1 box-border">
+            <View className="justify-around flex-row my-4">
                 {
                     weekDays.map((weekDay, i) => (
                         <View 
@@ -73,36 +115,39 @@ export function NewExerciseForm({ exercise_id, user_id }: NewExerciseFormProps) 
                         </View>
                     ))
                 }
-                </View>
+            </View>
 
-                <View className="flex-row items-center gap-4 mb-5">
+                <View className="flex flex-row flex-wrap items-center gap-4 mb-5">
                     <Barbell size={32} color="#00875F" />
+                    <Text className="text-white font-medium">Séries:</Text>
                     <ControlledInput 
-                        name="series"
+                        name="amount_series"
                         className="w-14 bg-gray_500 py-1 px-2 font-regular text-base rounded-md text-white" 
                         keyboardType="numeric" 
                         placeholder="0" 
                         placeholderTextColor="#7C7C8A"
                         control={control}
+                        error={errors.amount_series}
                     />
-                    <Text className="text-white font-medium">Séries</Text>
                 </View>
 
-                <View className="flex-row items-center gap-4 mb-5">
+                <View className="flex-row flex-wrap items-center gap-4 mb-5">
                     <Repeat size={32} color="#00875F" />
+                    <Text className="text-white font-medium">Repetições:</Text>
                     <ControlledInput
-                        name="repeat" 
+                        name="amount_repeat" 
                         className="w-14 bg-gray_500 py-1 px-2 font-regular text-base rounded-md text-white" 
                         keyboardType="numeric" 
                         placeholder="0" 
                         placeholderTextColor="#7C7C8A"
                         control={control}
+                        error={errors.amount_repeat}
                     />
-                    <Text className="text-white font-medium">Repetições</Text>
                 </View>
 
                 <View className="flex-row items-center gap-4 mb-5">
                     <AlignCenterHorizontal size={32} color="#00875F" />
+                    <Text className="text-white font-medium">Carga (kg):</Text>
                     <ControlledInput 
                         name="load"
                         className="w-14 bg-gray_500 py-1 px-2 font-regular text-base rounded-md text-white" 
@@ -111,11 +156,10 @@ export function NewExerciseForm({ exercise_id, user_id }: NewExerciseFormProps) 
                         placeholderTextColor="#7C7C8A"
                         control={control}
                     />
-                    <Text className="text-white font-medium">Carga (kg)</Text>
                 </View>
 
                 <Button 
-                    action={handleSubmit(handleExerciseRegister)} 
+                    action={handleSubmit(handleExerciseRegister)}
                     title="Adicionar exercício"
                 />
         </View>
