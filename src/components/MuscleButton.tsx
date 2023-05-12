@@ -13,7 +13,7 @@ export function MuscleButton({ title, selected, action }: ButtonProps) {
             {
                 selected ? (
                     <TouchableOpacity
-                        className="mr-3 bg-gray_500 w-24 h-11 border border-green_500 rounded-lg justify-center items-center" 
+                        className="mr-3 bg-gray_500 p-3 border border-green_500 rounded-lg justify-center items-center" 
                         onPress={action}
                         activeOpacity={0.8}
                     >
@@ -21,7 +21,7 @@ export function MuscleButton({ title, selected, action }: ButtonProps) {
                     </TouchableOpacity>
                 ) : (
                     <TouchableOpacity
-                        className="mr-3 bg-gray_500 w-24 h-11 rounded-lg justify-center items-center"
+                        className="mr-3 bg-gray_500 p-2 rounded-lg justify-center items-center"
                         onPress={action}
                         activeOpacity={0.8}
                     >

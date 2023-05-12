@@ -3,7 +3,7 @@ import { View, Text, SafeAreaView, ScrollView, TouchableOpacity, Pressable, Aler
 import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { CheckBox } from "../components/CheckBox";
-import { Barbell, Repeat, Trash, Person } from "phosphor-react-native";
+import { Barbell, Repeat, Trash, Person, ArrowsCounterClockwise } from "phosphor-react-native";
 import colors from "tailwindcss/colors";
 import api from "../services/api";
 import { Loading } from "../components/Loading";
@@ -27,6 +27,12 @@ export function Historic() {
             header: () => (
                 <View className="bg-secondary h-[100] flex flex-row items-center justify-center px-5">
                     <Text className="text-white font-medium text-lg">Ficha Semanal</Text>
+                    <Pressable 
+                        onPress={() => loadTrainings()}
+                        className="absolute left-6"
+                    >
+                        <ArrowsCounterClockwise size={30} color="#00B37E" />
+                    </Pressable>
                 </View>
             )
         });
@@ -34,9 +40,7 @@ export function Historic() {
     }, [navigation]);
 
     useEffect(() => {
-
         loadTrainings();
-
     }, [days]);
 
     async function loadTrainings() {
@@ -152,7 +156,7 @@ export function Historic() {
                                             key={`${training.training_id}`}
                                         >
                                             <View>
-                                                <Text className="text-green_500 font-medium text-lg mb-3">
+                                                <Text className="text-white font-medium text-lg mb-3">
                                                     {training.name}
                                                 </Text>
                                                 <View className="flex flex-row gap-3 items-center mb-3">
