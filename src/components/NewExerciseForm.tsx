@@ -20,8 +20,8 @@ type FormData = {
 }
 
 type NewExerciseFormProps = {
-    exercise_id: number;
-    user_id: number;
+    exercise_id: string;
+    user_id: string;
 }
 
 const schema = yup.object({

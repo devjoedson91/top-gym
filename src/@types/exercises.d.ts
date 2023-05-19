@@ -1,5 +1,5 @@
 interface ExercisesProps {
-    id: number;
+    id: string;
     name: string;
     cover: string;
     video: string;

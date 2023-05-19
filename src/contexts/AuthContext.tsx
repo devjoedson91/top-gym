@@ -14,6 +14,9 @@ type AuthProviderProps = {
 }
 
 type UserProps = {
+    id: string;
+    name: string;
+    email: string;
 	token: string;
 };
 
@@ -27,12 +30,15 @@ export const AuthContext = createContext({} as AuthContextData);
 export function AuthProvider({ children }: AuthProviderProps) {
 
     const [user, setUser] = useState<UserProps>({
+        id: '',
+        name: '',
+        email: '',
         token: ''
     });
 
     const [loadingAuth, setLoadingAuth] = useState(false);
 
-    const isAuthenticated = !!user.token;
+    const isAuthenticated = !!user.name;
 
     useEffect(() => {
 
@@ -45,7 +51,12 @@ export function AuthProvider({ children }: AuthProviderProps) {
             if (Object.keys(hasUser).length > 0) {
                 api.defaults.headers.common['Authorization'] = `Bearer ${hasUser.token}`;
 
-                setUser({ token: hasUser.token });
+                setUser({ 
+                    id: hasUser.id,
+                    name: hasUser.name,
+                    email: hasUser.email,
+                    token: hasUser.token 
+                });
             }
 
         }
@@ -60,15 +71,17 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
         try {
 
-            const response = await api.post('/login', { email, password })
+            const response = await api.post('/session', { email, password })
 
-            const { token } = response.data;
+            const { id, name, token } = response.data;
 
-            await AsyncStorage.setItem('@top-gym', JSON.stringify(token));
+            const data = {...response.data};
+
+            await AsyncStorage.setItem('@top-gym', JSON.stringify(data));
 
             api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
 
-            setUser({ token });
+            setUser({ id, name, email, token });
 
             setLoadingAuth(false);
         } catch(err) {
@@ -79,14 +92,14 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
     async function signOut() {
 
-        const response = await api.post('/v1/logout');
+        // const response = await api.post('/v1/logout');
 
-        const { msg } = response.data;
+        // const { msg } = response.data;
 
-        alert(msg);
+        // alert(msg);
 
 		await AsyncStorage.clear().then(() => {
-			setUser({ token: '' });
+            setUser({ id: '', name: '', email: '', token: '' });
 		});
 	}
 

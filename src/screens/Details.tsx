@@ -6,6 +6,7 @@ import { Header } from "../components/Header";
 import { CaretLeft, Person, Play } from "phosphor-react-native";
 import { VideoView } from "../components/VideoView";
 import { NewExerciseForm } from "../components/NewExerciseForm";
+import api from "../services/api";
 
 type RouteDetailParams = {
     Detail: ExerciseDetailProps;
@@ -21,6 +22,26 @@ export function Details() {
 
     const [showVideo, setShowVideo] = useState(false);
 
+    const [loading, setLoading] = useState(false);
+
+    const [me, setMe] = useState<UserInfoProps>();
+
+    useLayoutEffect(() => {
+
+        async function userInfo() {
+
+            setLoading(true);
+
+            const response = await api.get('/me');
+
+            setMe(response.data);
+            setLoading(false);
+        }
+
+        userInfo();
+
+    }, []);
+
     useLayoutEffect(() => {
 
         navigation.setOptions({
@@ -32,7 +53,7 @@ export function Details() {
                     <Text className="text-white font-medium text-lg">{route.params ? route.params?.name : 'Detalhes do Exercício'}</Text>
                     <View className="flex flex-row items-center gap-1">
                         <Person size={20} color="#C4C4CC" />
-                        <Text className="text-white font-medium text-base">{route.params?.category}</Text>
+                        <Text className="text-white font-medium text-base">{route.params?.categories.muscle}</Text>
                     </View>
                 </Header>
             ),
@@ -60,7 +81,7 @@ export function Details() {
                     <Image source={{uri: route.params?.cover}} className="w-full h-52 rounded-lg"/>
                 </Pressable>
 
-                <NewExerciseForm exercise_id={route.params?.id} user_id={1} />
+                <NewExerciseForm exercise_id={route.params?.id} user_id="797855f3-b9f5-4ef7-9bfc-fb23100d2e95" />
                 
                 <Modal visible={showVideo} animationType="slide">
                     <VideoView 

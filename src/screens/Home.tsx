@@ -1,5 +1,5 @@
 import { useContext, useLayoutEffect, useEffect, useState, useRef } from "react";
-import { Pressable, Text, View, Image, FlatList, TouchableOpacity, SafeAreaView } from "react-native";
+import { Pressable, Text, View, Image, FlatList, TouchableOpacity, SafeAreaView, Alert } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { SignOut, CaretRight } from "phosphor-react-native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
@@ -17,6 +17,25 @@ export function Home() {
 
     const { signOut } = useContext(AuthContext);
 
+    const [me, setMe] = useState<UserInfoProps>();
+
+    useEffect(() => {
+
+        async function userInfo() {
+
+            setLoading(true);
+
+            const response = await api.get('/me');
+
+            setMe(response.data);
+
+            setLoading(false);
+        }
+
+        userInfo();
+
+    }, []);
+
     useLayoutEffect(() => {
 
         tabNavigation.setOptions({
@@ -25,11 +44,11 @@ export function Home() {
                     <View className="flex flex-row gap-3 items-center">
                         <Image 
                             className="w-[60px] h-[60px] rounded-full"
-                            source={require('../assets/perfil.jpg')} 
+                            source={me?.avatar ? {uri: me.avatar} : require('../assets/no-perfil.jpg')}
                         />
                         <View>
                             <Text className="text-white font-medium">Olá,</Text>
-                            <Text className="text-white font-bold text-base">Joedson Ferreira</Text>
+                            <Text className="text-white font-bold text-base">{me?.name}</Text>
                         </View>                   
                     </View>
                     <Pressable onPress={signOut}>
@@ -38,53 +57,79 @@ export function Home() {
                 </Header>
             ),            
         });
-    }, [tabNavigation]);
+
+    }, [tabNavigation, me]);
 
     const [categories, setCategories] = useState<CategoriesProps[]>([]);
     const [muscleSelected, setMuscleSelected] = useState<CategoriesProps | undefined>();
 
-    const [exercises, setExercises] = useState<ExercisesProps[]>([]);
+    const [exercises, setExercises] = useState<ExerciseDetailProps[]>([]);
 
     const [loading, setLoading] = useState(false);
 
-    async function listCategories() {
+    useEffect(() => { 
 
-        setLoading(true);
+        async function listCategories() {
 
-        const response = await api.get('/v1/categories');
+            try {
+    
+                setLoading(true);
+    
+                const response = await api.get('/categories');
+    
+                setCategories(() => {
+    
+                    const sortCategories = 
+                    response.data.sort((a: CategoriesProps, b: CategoriesProps) => (a.muscle > b.muscle) ? 1 : ((b.muscle > a.muscle) ? -1 : 0));
+    
+                    return sortCategories;
+    
+                });
+    
+                setMuscleSelected(response.data[0]);
+    
+                setLoading(false);
+    
+            } catch(err) {
+    
+                setLoading(false);
+                console.log('erro na requisição de categorias: ', err);
+            }
+    
+        }
 
-        setCategories(() => {
-
-            const sortCategories = 
-            response.data.sort((a: CategoriesProps, b: CategoriesProps) => (a.name > b.name) ? 1 : ((b.name > a.name) ? -1 : 0));
-
-            return sortCategories;
-
-        });
-
-        setMuscleSelected(response.data[0]);
-
-        setLoading(false);
-
-    }
+        listCategories();
+    }, []);
 
     async function listExercises() {
 
-        setLoading(true);
+        try {
 
-        const response = await api.get(`/v1/categories/${muscleSelected?.id || ''}`);
+           if (muscleSelected?.id) {
 
-        const { exercises } = response.data;
+                setLoading(true);
 
-        setExercises(exercises);
+                const response = await api.get('/category/exercise', {
+                    params: {
+                        category_id: muscleSelected.id
+                    }
+                });
 
-        setLoading(false);
+                setExercises(response.data);
+
+                setLoading(false);
+
+           } else {
+              return;
+           }
+
+        } catch(err) {
+
+            setLoading(false);
+            console.log('erro na requisição de exercicios: ', err);
+        }
 
     }
-
-    useEffect(() => { 
-        listCategories() 
-    }, []);
 
     useEffect(() => {
 
@@ -105,16 +150,22 @@ export function Home() {
 
     }
 
+    if (loading) {
+
+        return <Loading />;
+
+    }
+
     return (
       <SafeAreaView className="bg-background flex-1 p-6">
         <View className="mb-6">
           <FlatList 
             data={categories}
-            keyExtractor={item => String(item.id)}
+            keyExtractor={item => item.id}
             renderItem={({item}) => (
 
                 <MuscleButton 
-                    title={item.name} 
+                    title={item.muscle} 
                     selected={muscleSelected?.id === item.id}
                     action={() => handleSelectMuscle(item)} 
                 />
@@ -132,12 +183,12 @@ export function Home() {
             ) : (
                 <FlatList 
                     data={exercises}
-                    keyExtractor={item => String(item.id)}
+                    keyExtractor={item => item.id}
                     renderItem={({item}) => (
                         <TouchableOpacity 
                             className="bg-gray_500 mb-3 w-full h-[120px] py-3 rounded-lg flex flex-row items-center justify-around"
                             key={item.id} 
-                            onPress={() => handleNavigate({...item, category: muscleSelected?.name})}
+                            onPress={() => handleNavigate(item)}
                         >
                             {
                                 item.cover ? (

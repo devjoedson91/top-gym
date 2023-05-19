@@ -1,5 +1,5 @@
 interface TrainingsProps {
-    training_id: number;
+    training_id: string;
     category: string;
     name: string;
     amount_series: number;

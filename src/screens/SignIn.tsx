@@ -1,11 +1,12 @@
 import { useContext, useState } from "react";
-import { SafeAreaView, Text, View, TextInput, TouchableOpacity, ActivityIndicator } from "react-native";
+import { SafeAreaView, Text, View, TextInput, TouchableOpacity, ActivityIndicator, Pressable } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
-import { Barbell } from "phosphor-react-native";
+import { Barbell, Eye, EyeSlash } from "phosphor-react-native";
 import { BackgroundPage } from "../components/BackgroundPage";
 import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { AuthContext } from "../contexts/AuthContext";
+import colors from "tailwindcss/colors";
 
 export function SignIn() {
 
@@ -15,6 +16,7 @@ export function SignIn() {
 
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
+    const [hidePass, setHidePass] = useState(true);
 
     async function handleLogin() {
 
@@ -42,14 +44,25 @@ export function SignIn() {
                             value={email}
                             onChangeText={setEmail}
                         />
-                        <TextInput 
-                             className="w-full bg-gray_500 p-3 font-regular text-base rounded-md text-white"
-                             placeholder="Senha"
-                             placeholderTextColor="#7C7C8A"
-                             secureTextEntry={true} 
-                             value={password}
-                             onChangeText={setPassword}
-                        />
+                        <View className="flex flex-row w-full bg-gray_500 p-3 rounded-md">
+                            <TextInput 
+                                className="w-[85%] font-regular text-base text-white"
+                                placeholder="Senha"
+                                placeholderTextColor="#7C7C8A"
+                                secureTextEntry={hidePass} 
+                                value={password}
+                                onChangeText={setPassword}
+                            />
+                            <Pressable 
+                                className="w-[15%] items-end justify-center"
+                                onPress={() => setHidePass(!hidePass)}
+                            >
+                                {
+                                    hidePass ? (<EyeSlash size={25} color={colors.white} />) : 
+                                    (<Eye size={25} color={colors.white} /> )
+                                }
+                            </Pressable>
+                        </View>
                         <TouchableOpacity 
                             className="flex justify-center items-center rounded-md bg-green_700 py-3 w-full" 
                             activeOpacity={0.8}

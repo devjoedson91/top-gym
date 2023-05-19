@@ -1,4 +1,4 @@
 interface CategoriesProps {
-    id: number;
-    name: string;
+    id: string;
+    muscle: string;
 }
