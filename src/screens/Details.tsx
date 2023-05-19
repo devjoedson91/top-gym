@@ -1,4 +1,4 @@
-import { useEffect, useLayoutEffect, useState } from "react";
+import { useContext, useEffect, useLayoutEffect, useState } from "react";
 import { Text, View, Pressable, Image, Modal, KeyboardAvoidingView, Platform, ScrollView } from "react-native";
 import { RouteProp, useRoute, useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
@@ -7,6 +7,8 @@ import { CaretLeft, Person, Play } from "phosphor-react-native";
 import { VideoView } from "../components/VideoView";
 import { NewExerciseForm } from "../components/NewExerciseForm";
 import api from "../services/api";
+import { Loading } from "../components/Loading";
+import { AuthContext } from "../contexts/AuthContext";
 
 type RouteDetailParams = {
     Detail: ExerciseDetailProps;
@@ -24,23 +26,7 @@ export function Details() {
 
     const [loading, setLoading] = useState(false);
 
-    const [me, setMe] = useState<UserInfoProps>();
-
-    useLayoutEffect(() => {
-
-        async function userInfo() {
-
-            setLoading(true);
-
-            const response = await api.get('/me');
-
-            setMe(response.data);
-            setLoading(false);
-        }
-
-        userInfo();
-
-    }, []);
+    const { me } = useContext(AuthContext);
 
     useLayoutEffect(() => {
 
@@ -67,6 +53,10 @@ export function Details() {
 
     }
 
+    if (loading) {
+        return <Loading />;
+    }
+
     return (
         <KeyboardAvoidingView 
             className="bg-background flex-1 p-4" 
@@ -81,7 +71,7 @@ export function Details() {
                     <Image source={{uri: route.params?.cover}} className="w-full h-52 rounded-lg"/>
                 </Pressable>
 
-                <NewExerciseForm exercise_id={route.params?.id} user_id="797855f3-b9f5-4ef7-9bfc-fb23100d2e95" />
+                <NewExerciseForm exercise_id={route.params?.id} user_id={me?.id} />
                 
                 <Modal visible={showVideo} animationType="slide">
                     <VideoView 

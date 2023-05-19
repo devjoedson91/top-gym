@@ -21,7 +21,7 @@ type FormData = {
 
 type NewExerciseFormProps = {
     exercise_id: string;
-    user_id: string;
+    user_id: string | undefined;
 }
 
 const schema = yup.object({
@@ -66,7 +66,7 @@ export function NewExerciseForm({ exercise_id, user_id }: NewExerciseFormProps) 
 
             days.forEach(async (day: number) => {
 
-                await api.post('/v1/trainings', {
+                await api.post('/training', {
                     exercise_id,
                     user_id,
                     amount_series: data.amount_series,

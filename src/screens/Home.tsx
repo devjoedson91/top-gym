@@ -17,24 +17,7 @@ export function Home() {
 
     const { signOut } = useContext(AuthContext);
 
-    const [me, setMe] = useState<UserInfoProps>();
-
-    useEffect(() => {
-
-        async function userInfo() {
-
-            setLoading(true);
-
-            const response = await api.get('/me');
-
-            setMe(response.data);
-
-            setLoading(false);
-        }
-
-        userInfo();
-
-    }, []);
+    const { me } = useContext(AuthContext);
 
     useLayoutEffect(() => {
 
@@ -44,11 +27,11 @@ export function Home() {
                     <View className="flex flex-row gap-3 items-center">
                         <Image 
                             className="w-[60px] h-[60px] rounded-full"
-                            source={me?.avatar ? {uri: me.avatar} : require('../assets/no-perfil.jpg')}
+                            source={me.avatar ? {uri: me.avatar} : require('../assets/no-perfil.jpg')}
                         />
                         <View>
                             <Text className="text-white font-medium">Olá,</Text>
-                            <Text className="text-white font-bold text-base">{me?.name}</Text>
+                            <Text className="text-white font-bold text-base">{me.name}</Text>
                         </View>                   
                     </View>
                     <Pressable onPress={signOut}>

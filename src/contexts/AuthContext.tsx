@@ -1,11 +1,14 @@
 import { ReactNode, createContext, useEffect, useState } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import api from "../services/api";
+import { Alert } from "react-native";
 
 type AuthContextData = {
     loadingAuth: boolean;
     isAuthenticated: boolean;
+    me: UserInfoProps;
     signIn: (credentials: SignInProps) => Promise<void>;
+    signUp: (credentials: SignUpProps) => Promise<void>;
     signOut: () => Promise<void>;
 }
 
@@ -25,6 +28,12 @@ type SignInProps = {
 	password: string;
 };
 
+type SignUpProps = {
+    name: string;
+    email: string;
+    password: string;
+}
+
 export const AuthContext = createContext({} as AuthContextData);
 
 export function AuthProvider({ children }: AuthProviderProps) {
@@ -34,6 +43,13 @@ export function AuthProvider({ children }: AuthProviderProps) {
         name: '',
         email: '',
         token: ''
+    });
+
+    const [me, setMe] = useState<UserInfoProps>({
+        id: '',
+        name: '',
+        email: '',
+        avatar: ''
     });
 
     const [loadingAuth, setLoadingAuth] = useState(false);
@@ -65,6 +81,19 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
     }, []);
 
+    useEffect(() => {
+
+        async function userInfo() {
+
+            const response = await api.get('/me');
+
+            setMe(response.data);
+        }
+
+        userInfo();
+
+    }, [user]);
+
     async function signIn({ email, password }: SignInProps) {
 
         setLoadingAuth(true);
@@ -90,6 +119,23 @@ export function AuthProvider({ children }: AuthProviderProps) {
         }
     }
 
+    async function signUp(data: SignUpProps) {
+
+        setLoadingAuth(true);
+
+        try {
+
+            await api.post('/users', { name: data.name, email: data.email, password: data.password });
+            setLoadingAuth(false);
+
+        } catch(err) {
+            Alert.alert('Erro ao cadastrar usuário: '+err);
+            console.log('ERRO AO CADASTRAR: ', err);
+            setLoadingAuth(false);
+        }
+
+    }
+
     async function signOut() {
 
         // const response = await api.post('/v1/logout');
@@ -104,7 +150,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
 	}
 
     return (
-        <AuthContext.Provider value={{ isAuthenticated, loadingAuth, signIn, signOut }}>
+        <AuthContext.Provider value={{ isAuthenticated, loadingAuth, me, signIn, signOut, signUp }}>
             { children }
         </AuthContext.Provider>
     );

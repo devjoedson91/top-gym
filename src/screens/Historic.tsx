@@ -1,4 +1,4 @@
-import { useEffect, useLayoutEffect, useState } from "react";
+import { useContext, useEffect, useLayoutEffect, useState } from "react";
 import { View, Text, SafeAreaView, ScrollView, TouchableOpacity, Pressable, Alert } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
@@ -7,12 +7,15 @@ import { Barbell, Repeat, Trash, Person, ArrowsCounterClockwise } from "phosphor
 import colors from "tailwindcss/colors";
 import api from "../services/api";
 import { Loading } from "../components/Loading";
+import { AuthContext } from "../contexts/AuthContext";
 
 const weekDays = ['D', 'S', 'T', 'Q', 'Q', 'S', 'S'];
 
 export function Historic() {
 
     const navigation = useNavigation<NativeStackNavigationProp<TabParamsList>>();
+
+    const { me } = useContext(AuthContext);
 
     const [days, setDays] = useState<number[]>([1]);
 
@@ -39,17 +42,19 @@ export function Historic() {
 
     }, [navigation]);
 
-    useEffect(() => {
-        loadTrainings();
-    }, [days]);
-
     async function loadTrainings() {
-
-        setLoading(true);
 
         try {
 
-            const response = await api.get('/v1/trainings/1');
+            setLoading(true);
+
+            console.log(me.id);
+
+            const response = await api.get('/user/trainings', {
+                params: {
+                    user_id: me.id
+                }
+            });
 
             const filterTraining = response.data.filter((training: TrainingsProps ) => {
 
@@ -59,7 +64,7 @@ export function Historic() {
 
             const keys = filterTraining.map((key: TrainingsProps) => {
 
-                return key.category;
+                return key.muscle;
 
             });
 
@@ -79,20 +84,44 @@ export function Historic() {
 
     }
 
+    useEffect(() => {
+        loadTrainings();
+    }, [days]);
+
     function handleToggleWeekDay(weekDayIndex: number) {
 
         setDays(prevState => [weekDayIndex]);
 
     }
 
-    async function handlePutAsCompleted(training_id: number, is_completed: boolean) {
+    async function handlePutAsCompleted(id: string) {
 
+        try {
+
+            setLoading(true);
+
+            await api.patch(`/training?training_id=${id}`);
+            loadTrainings();
+
+            setLoading(false);
+
+        } catch(err) {
+
+            setLoading(false);
+            console.log('erro ao completar ou descompletar treino: ', err);
+        }
+
+    }
+
+    async function handlePutAsDeleted(id: string) {
         setLoading(true);
 
         try {
 
-            await api.patch(`/v1/trainings/${training_id}`, {
-                is_completed: !is_completed
+            await api.delete('/training', {
+                params: {
+                    training_id: id
+                }
             });
 
             loadTrainings();
@@ -102,12 +131,8 @@ export function Historic() {
         } catch(err) {
 
             setLoading(false);
+            console.log('erro ao remover treino: ', err);
         }
-
-    }
-
-    function handlePutAsDeleted(training_id: number) {
-
     }
 
     return (
@@ -150,14 +175,14 @@ export function Historic() {
                                 </View>
                                 {
                                     trainings.map((training, i) => (
-                                        training.category === category &&
+                                        training.muscle === category &&
                                         <TouchableOpacity 
                                             className="bg-gray_500 mb-3 w-full p-3 rounded-lg flex flex-row items-center justify-between" 
-                                            key={`${training.training_id}`}
+                                            key={`${training.id}`}
                                         >
                                             <View>
                                                 <Text className="text-white font-medium text-lg mb-3">
-                                                    {training.name}
+                                                    {training.exercise}
                                                 </Text>
                                                 <View className="flex flex-row gap-3 items-center mb-3">
                                                     <Barbell size={32} color="#00875F" />
@@ -176,12 +201,12 @@ export function Historic() {
                                                 <View className="flex flex-row gap-3 items-center">
                                                     <CheckBox 
                                                         checked={training.is_completed}
-                                                        onPress={() => handlePutAsCompleted(training.training_id, training.is_completed)}
+                                                        onPress={() => handlePutAsCompleted(training.id)}
                                                     />
                                                     <Text className="text-white font-medium text-base">Marcar como concluído</Text>
                                                 </View>
                                             </View>
-                                            <Pressable onPress={() => handlePutAsDeleted(training.training_id)}>
+                                            <Pressable onPress={() => handlePutAsDeleted(training.id)}>
                                                 <Trash size={38} color={colors.red['500']} />
                                             </Pressable>
                                         </TouchableOpacity>
