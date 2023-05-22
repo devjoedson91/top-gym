@@ -1,4 +1,4 @@
-import { useContext, useEffect, useLayoutEffect, useState } from "react";
+import { useContext, useLayoutEffect, useState } from "react";
 import { Text, View, Pressable, Image, Modal, KeyboardAvoidingView, Platform, ScrollView } from "react-native";
 import { RouteProp, useRoute, useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
@@ -6,8 +6,6 @@ import { Header } from "../components/Header";
 import { CaretLeft, Person, Play } from "phosphor-react-native";
 import { VideoView } from "../components/VideoView";
 import { NewExerciseForm } from "../components/NewExerciseForm";
-import api from "../services/api";
-import { Loading } from "../components/Loading";
 import { AuthContext } from "../contexts/AuthContext";
 
 type RouteDetailParams = {
@@ -23,8 +21,6 @@ export function Details() {
     const navigation = useNavigation<NativeStackNavigationProp<TabParamsList>>();
 
     const [showVideo, setShowVideo] = useState(false);
-
-    const [loading, setLoading] = useState(false);
 
     const { me } = useContext(AuthContext);
 
@@ -51,10 +47,6 @@ export function Details() {
 
         setShowVideo(true);
 
-    }
-
-    if (loading) {
-        return <Loading />;
     }
 
     return (

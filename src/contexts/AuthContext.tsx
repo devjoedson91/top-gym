@@ -1,12 +1,13 @@
 import { ReactNode, createContext, useEffect, useState } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import api from "../services/api";
-import { Alert } from "react-native";
+import { Alert, ToastAndroid } from "react-native";
 
 type AuthContextData = {
     loadingAuth: boolean;
     isAuthenticated: boolean;
     me: UserInfoProps;
+    userInfo: () => void;
     signIn: (credentials: SignInProps) => Promise<void>;
     signUp: (credentials: SignUpProps) => Promise<void>;
     signOut: () => Promise<void>;
@@ -49,6 +50,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
         id: '',
         name: '',
         email: '',
+        password: '',
         avatar: ''
     });
 
@@ -83,16 +85,23 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
     useEffect(() => {
 
-        async function userInfo() {
+        !!user.name && userInfo();
+
+    }, [user]);
+
+    async function userInfo() {
+
+        try {
 
             const response = await api.get('/me');
 
             setMe(response.data);
+        } catch(err) {
+
+            console.log('erro ao carregar informações do usuario: ', err);
         }
-
-        userInfo();
-
-    }, [user]);
+        
+    }
 
     async function signIn({ email, password }: SignInProps) {
 
@@ -147,10 +156,11 @@ export function AuthProvider({ children }: AuthProviderProps) {
 		await AsyncStorage.clear().then(() => {
             setUser({ id: '', name: '', email: '', token: '' });
 		});
+
 	}
 
     return (
-        <AuthContext.Provider value={{ isAuthenticated, loadingAuth, me, signIn, signOut, signUp }}>
+        <AuthContext.Provider value={{ isAuthenticated, loadingAuth, me, userInfo, signIn, signOut, signUp }}>
             { children }
         </AuthContext.Provider>
     );

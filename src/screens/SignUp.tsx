@@ -7,7 +7,6 @@ import { useForm } from "react-hook-form";
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { ControlledInput } from "../components/ControlledInput";
-import { Button } from "../components/Button";
 import { useContext } from "react";
 import { AuthContext } from "../contexts/AuthContext";
 
@@ -20,7 +19,7 @@ type FormData = {
 const schema = yup.object({
     name: yup.string().required('Informe o seu nome'),
     email: yup.string().email('E-mail inválido').required('Informe o e-mail'),
-    password: yup.string().min(4, 'A senha deve ter ao menos 6 digitos').required('Informe a senha'),
+    password: yup.string().min(4, 'A senha deve ter ao menos 4 digitos').required('Informe a senha'),
     // password_confirm: yup.string().oneOf([yup.ref('password')], 'A senha de confirmação não confere')
 });
 

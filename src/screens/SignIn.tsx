@@ -7,6 +7,20 @@ import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { AuthContext } from "../contexts/AuthContext";
 import colors from "tailwindcss/colors";
+import { useForm } from "react-hook-form";
+import * as yup from "yup";
+import { yupResolver } from "@hookform/resolvers/yup";
+import { ControlledInput } from "../components/ControlledInput";
+
+type FormData = {
+    email: string;
+    password: string;
+}
+
+const schema = yup.object({
+    email: yup.string().email('E-mail inválido').required('Informe o e-mail'),
+    password: yup.string().required('Informe a senha'),
+});
 
 export function SignIn() {
 
@@ -14,15 +28,15 @@ export function SignIn() {
 
     const { signIn, loadingAuth } = useContext(AuthContext);
 
-    const [email, setEmail] = useState("");
-    const [password, setPassword] = useState("");
+    const { control, handleSubmit, formState: { errors }} = useForm<FormData>({
+        resolver: yupResolver(schema)
+    });
+
     const [hidePass, setHidePass] = useState(true);
 
-    async function handleLogin() {
+    async function handleLogin(data: FormData) {
 
-        // if (email === '' || password === '') return;
-
-        await signIn({ email, password });
+        await signIn(data);
 
     }
 
@@ -37,21 +51,23 @@ export function SignIn() {
                     </View>
                     <View className="w-full flex items-center gap-5">
                         <Text className="text-white text-lg font-medium">Acesse sua conta</Text>
-                        <TextInput 
+                        <ControlledInput 
+                            name="email"
                             className="w-full bg-gray_500 p-3 font-regular text-base rounded-md text-white"
                             placeholder="E-mail"
                             placeholderTextColor="#7C7C8A" 
-                            value={email}
-                            onChangeText={setEmail}
+                            control={control}
+                            error={errors.email}
                         />
                         <View className="flex flex-row w-full bg-gray_500 p-3 rounded-md">
-                            <TextInput 
+                            <ControlledInput
+                                name="password" 
                                 className="w-[85%] font-regular text-base text-white"
                                 placeholder="Senha"
                                 placeholderTextColor="#7C7C8A"
                                 secureTextEntry={hidePass} 
-                                value={password}
-                                onChangeText={setPassword}
+                                control={control}
+                                error={errors.password}
                             />
                             <Pressable 
                                 className="w-[15%] items-end justify-center"
@@ -66,7 +82,7 @@ export function SignIn() {
                         <TouchableOpacity 
                             className="flex justify-center items-center rounded-md bg-green_700 py-3 w-full" 
                             activeOpacity={0.8}
-                            onPress={() => handleLogin()}
+                            onPress={() => handleSubmit(handleLogin)}
                         >
                             {
                                 loadingAuth ? (

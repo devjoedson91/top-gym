@@ -7,6 +7,6 @@ type Props = {
 export function Error({ text }: Props) {
 
     return (
-        <Text className="text-red_default ml-4 font-regular">{text}</Text>
+        <Text className="text-red_default ml-1 font-regular">{text}</Text>
     );
 }
