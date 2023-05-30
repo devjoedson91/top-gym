@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { View, Text, Alert } from "react-native";
+import { useContext, useState } from "react";
+import { View, Text, ToastAndroid } from "react-native";
 import { CheckBox } from "./CheckBox";
 import { Barbell, Repeat, AlignCenterHorizontal } from "phosphor-react-native";
 import { useForm } from "react-hook-form";
@@ -10,6 +10,7 @@ import * as yup from "yup";
 import api from "../services/api";
 import { Loading } from "./Loading";
 import { useNavigation } from "@react-navigation/native";
+import { AuthContext } from "../contexts/AuthContext";
 
 const weekDays = ['D', 'S', 'T', 'Q', 'Q', 'S', 'S'];
 
@@ -38,6 +39,8 @@ export function NewExerciseForm({ exercise_id, user_id }: NewExerciseFormProps) 
         resolver: yupResolver(schema)
     });
 
+    const {signOut} = useContext(AuthContext);
+
     const [days, setDays] = useState<number[]>([]);
 
     const [loading, setLoading] = useState(false);
@@ -56,37 +59,44 @@ export function NewExerciseForm({ exercise_id, user_id }: NewExerciseFormProps) 
 
         if (days.length === 0) {
 
-            Alert.alert('Para concluir, você deve selecionar ao menos um dia da semana.');
+            ToastAndroid.show('Para concluir, você deve selecionar ao menos um dia da semana.', ToastAndroid.SHORT);
             return;
         }
 
         setLoading(true);
 
-        try {
+        days.map(async (day: number) => {
 
-            days.forEach(async (day: number) => {
+            await api.post('/training', {
+                exercise_id,
+                user_id,
+                amount_series: data.amount_series,
+                amount_repeat: data.amount_repeat,
+                load: data.load,
+                day_week: day
+            })
+                .then(response => {
 
-                await api.post('/training', {
-                    exercise_id,
-                    user_id,
-                    amount_series: data.amount_series,
-                    amount_repeat: data.amount_repeat,
-                    load: data.load,
-                    day_week: day
+                    ToastAndroid.show('Exercício adicionado com sucesso!', ToastAndroid.SHORT);
+
                 })
-    
-            });
+                .catch(error => {
 
-            Alert.alert('Exercício adicionado com sucesso!');
-            setLoading(false);
-            navigate.goBack();
+                    if (error.response.status === 401) {
 
+                        ToastAndroid.show('Sessão Expirada!', ToastAndroid.SHORT);
+                        signOut();
 
-        } catch(err) {
-            Alert.alert('Erro ao cadastrar exercício '+err);
-            console.log('Erro ao cadastrar treino: ', err);
-            setLoading(false);
-        } 
+                    }
+
+                    ToastAndroid.show(error.response.data.error, ToastAndroid.SHORT);
+                    console.log('erro ao cadastrar treino: ', error.response.data.error);
+
+                })
+
+        });
+
+        setLoading(false);
 
     }
 
@@ -95,7 +105,7 @@ export function NewExerciseForm({ exercise_id, user_id }: NewExerciseFormProps) 
     }
 
     return (
-        <View className="w-full flex flex-col px-1 box-border">
+        <View className="w-[90%] flex flex-col mx-auto box-border">
             <View className="justify-around flex-row my-4">
                 {
                     weekDays.map((weekDay, i) => (

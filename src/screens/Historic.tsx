@@ -1,5 +1,5 @@
 import { useContext, useEffect, useLayoutEffect, useState } from "react";
-import { View, Text, SafeAreaView, ScrollView, TouchableOpacity, Pressable, Alert } from "react-native";
+import { View, Text, SafeAreaView, ScrollView, TouchableOpacity, Pressable, Alert, Modal } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { CheckBox } from "../components/CheckBox";
@@ -8,6 +8,7 @@ import colors from "tailwindcss/colors";
 import api from "../services/api";
 import { Loading } from "../components/Loading";
 import { AuthContext } from "../contexts/AuthContext";
+import { VideoView } from "../components/VideoView";
 
 const weekDays = ['D', 'S', 'T', 'Q', 'Q', 'S', 'S'];
 
@@ -22,6 +23,8 @@ export function Historic() {
     const [trainings, setTrainings] = useState<TrainingsProps[]>([]);
     const [categories, setCategories] = useState<string[]>([]);
     const [loading, setLoading] = useState(false);
+    const [showVideo, setShowVideo] = useState(false);
+    const [videoUrl, setVideoUrl] = useState('');
 
     useLayoutEffect(() => {
 
@@ -47,8 +50,6 @@ export function Historic() {
         try {
 
             setLoading(true);
-
-            console.log(me.id);
 
             const response = await api.get('/user/trainings', {
                 params: {
@@ -135,6 +136,12 @@ export function Historic() {
         }
     }
 
+    function handleShowVideo(url: string) {
+
+        setShowVideo(true);
+        setVideoUrl(url);
+    }
+
     return (
         <SafeAreaView className="bg-background flex-1 px-6 pt-1">
             <View className="w-full justify-around flex-row mt-6 mb-3">
@@ -179,6 +186,8 @@ export function Historic() {
                                         <TouchableOpacity 
                                             className="bg-gray_500 mb-3 w-full p-3 rounded-lg flex flex-row items-center justify-between" 
                                             key={`${training.id}`}
+                                            activeOpacity={0.8}
+                                            onPress={() => handleShowVideo(training.video)}
                                         >
                                             <View>
                                                 <Text className="text-white font-medium text-lg mb-3">
@@ -215,6 +224,13 @@ export function Historic() {
                             </View>
                         ))
                     }
+
+                <Modal visible={showVideo} animationType="slide">
+                    <VideoView 
+                        handleClose={() => setShowVideo(false)}
+                        videoUrl={videoUrl}
+                    />
+                </Modal>
                 
                 </ScrollView>
             }

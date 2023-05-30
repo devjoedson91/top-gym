@@ -51,7 +51,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
         name: '',
         email: '',
         password: '',
-        avatar: ''
+        avatar: null
     });
 
     const [loadingAuth, setLoadingAuth] = useState(false);
@@ -153,7 +153,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
         // alert(msg);
 
-		await AsyncStorage.clear().then(() => {
+		await AsyncStorage.removeItem('@top-gym').then(() => {
             setUser({ id: '', name: '', email: '', token: '' });
 		});
 

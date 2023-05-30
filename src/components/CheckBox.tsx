@@ -16,7 +16,7 @@ export function CheckBox({ checked = false, ...rest }: Props) {
         >
             {
                 checked ? (
-                    <View className="w-8 h-8 bg-green_700 rounded-lg items-center justify-center">
+                    <View className="w-8 h-8 bg-green_500 rounded-lg items-center justify-center">
                         <Check size={25} color={colors.white} />
                     </View>
                 ) : (

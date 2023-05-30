@@ -31,7 +31,7 @@ export function Home() {
                         />
                         <View>
                             <Text className="text-white font-medium">Olá,</Text>
-                            <Text className="text-white font-bold text-base">{me.name}</Text>
+                            <Text className="text-white font-bold text-base">{me?.name}</Text>
                         </View>                   
                     </View>
                     <Pressable onPress={signOut}>
@@ -133,12 +133,6 @@ export function Home() {
 
     }
 
-    if (loading) {
-
-        return <Loading />;
-
-    }
-
     return (
       <SafeAreaView className="bg-background flex-1 p-6">
         <View className="mb-6">
@@ -169,7 +163,7 @@ export function Home() {
                     keyExtractor={item => item.id}
                     renderItem={({item}) => (
                         <TouchableOpacity 
-                            className="bg-gray_500 mb-3 w-full h-[120px] py-3 rounded-lg flex flex-row items-center justify-around"
+                            className="bg-gray_500 mb-3 w-full h-[120px] py-3 rounded-lg flex-row items-center justify-evenly box-border"
                             key={item.id} 
                             onPress={() => handleNavigate(item)}
                         >
@@ -178,13 +172,15 @@ export function Home() {
                                     <Image 
                                         source={{uri: item.cover}}
                                         className="w-[120px] h-full rounded-lg" 
-                                        resizeMode="contain"
+                                        resizeMode="cover"
                                     />
                                 ) : (
-                                    <View className="w-[120] h-full rounded-lg bg-gray_300"></View>
+                                    <View className="w-[120px] h-full rounded-lg bg-gray_300"></View>
                                 )
                             }
-                            <Text className="text-white font-medium text-base">{item.name}</Text>
+                            <View className="w-[150px]">
+                                <Text className="text-white text-center font-medium text-base">{item.name}</Text>
+                            </View>
                             <CaretRight size={32} color="#fff" />
                         </TouchableOpacity>
                     )}

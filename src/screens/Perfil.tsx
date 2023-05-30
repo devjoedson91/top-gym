@@ -10,22 +10,19 @@ import { AuthContext } from "../contexts/AuthContext";
 import * as ImagePicker from "expo-image-picker";
 import api from "../services/api";
 import { Loading } from "../components/Loading";
-import axios from "axios";
 import mime from "mime";
 
 type FormData = {
-    id: string;
     name: string;
-    email: string;
-    password: string;
+    email?: string;
+    password?: string;
     password_confirm: string;
-    avatar: string | null;
 }
 
 const schema = yup.object({
     name: yup.string(),
     email: yup.string().email('E-mail inválido'),
-    password: yup.string().min(4, 'A senha deve ter ao menos 4 digitos'),
+    password: yup.string(),
     password_confirm: yup.string().oneOf([yup.ref('password')], 'A senha de confirmação não confere')
 });
 
@@ -39,7 +36,7 @@ export function Perfil() {
 
     const navigation = useNavigation<NativeStackNavigationProp<TabParamsList>>();
 
-    const { control, handleSubmit, formState: { errors } } = useForm<FormData>({
+    const { control, handleSubmit, reset, formState: { errors } } = useForm<FormData>({
         resolver: yupResolver(schema)
     });
 
@@ -106,30 +103,41 @@ export function Perfil() {
 
     async function handleUserUpdate(data: FormData) {
 
-        const formData = new FormData();
+        let formData: any = {...data};
 
-        formData.append('name', data.name ?? me.name);
-        formData.append('email', data.email ?? me.email);
-        formData.append('password', data.password ?? me.password);  
+        if (avatarPreview !== '') {
+            Object.assign(formData, {avatar: avatarPreview});
+        }
 
-        if (avatar) formData.append('avatar', JSON.parse(JSON.stringify(avatar)));
+        Object.keys(data).map(key => {
 
-        console.log(formData);
+            if (formData[key] === '') delete formData[key];
+
+        });
+
+        if (formData['password']) {
+
+            if (formData['password'].length < 4) {
+
+                ToastAndroid.show('A senha deve ter ao menos 4 dígitos', ToastAndroid.SHORT);
+                return;
+            }
+
+            if (!formData['password_confirm'] || formData['password_confirm'] === '') {
+                ToastAndroid.show('Confirme a senha', ToastAndroid.SHORT);
+                return;
+            }
+        }
+
+        if (Object.keys(formData).length < 1) return;
 
         try {
 
             setLoading(true);
 
-            const response = await api.put(`/user?user_id=${me.id}`, 
-                formData,
-                {
-                    headers: {
-                        'Content-Type': 'multipart/form-data'
-                    }
-                }
-            );
+            await api.put(`/user?user_id=${me.id}`, formData);
 
-            if (data.email || data.password) {
+            if (formData.email || formData.password) {
 
                 setLoading(false);
                 ToastAndroid.show('Entre novamente com seu novo login e senha', ToastAndroid.SHORT);
@@ -169,10 +177,11 @@ export function Perfil() {
                         <Text className="font-regular text-green_500 text-base text-center">Alterar foto</Text>
                     </Pressable>
                 </View>
+
                 <View className="mb-3">
                     <ControlledInput 
                         name="name"
-                        className="w-full bg-gray_500 mb-3 p-3 font-regular text-base rounded-md text-white"
+                        className="w-full bg-gray_500 mb-1 p-3 font-regular text-base rounded-md text-white"
                         placeholder="Nome"
                         placeholderTextColor="#7C7C8A" 
                         control={control}
@@ -180,7 +189,7 @@ export function Perfil() {
                     />
                     <ControlledInput
                         name="email" 
-                        className="w-full bg-gray_500 p-3 font-regular text-base rounded-md text-white"
+                        className="w-full bg-gray_500 p-3 mb-1 mt-3 font-regular text-base rounded-md text-white"
                         placeholder="E-mail"
                         placeholderTextColor="#7C7C8A"
                         control={control}
@@ -191,7 +200,7 @@ export function Perfil() {
                     <Text className="font-regular text-white text-base mb-3">Alterar senha</Text>
                     <ControlledInput
                         name="password" 
-                        className="w-full bg-gray_500 mb-3 p-3 font-regular text-base rounded-md text-white"
+                        className="w-full bg-gray_500 mb-1 p-3 font-regular text-base rounded-md text-white"
                         placeholder="Nova senha"
                         placeholderTextColor="#7C7C8A"
                         secureTextEntry={true} 
@@ -200,7 +209,7 @@ export function Perfil() {
                     />
                     <ControlledInput 
                         name="password_confirm"
-                        className="w-full bg-gray_500 p-3 font-regular text-base rounded-md text-white"
+                        className="w-full bg-gray_500 p-3 mb-1 mt-3 font-regular text-base rounded-md text-white"
                         placeholder="Confirmar senha"
                         placeholderTextColor="#7C7C8A"
                         secureTextEntry={true} 

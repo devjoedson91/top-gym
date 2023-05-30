@@ -57,7 +57,6 @@ export function SignIn() {
                             placeholder="E-mail"
                             placeholderTextColor="#7C7C8A" 
                             control={control}
-                            error={errors.email}
                         />
                         <View className="flex flex-row w-full bg-gray_500 p-3 rounded-md">
                             <ControlledInput
@@ -67,7 +66,6 @@ export function SignIn() {
                                 placeholderTextColor="#7C7C8A"
                                 secureTextEntry={hidePass} 
                                 control={control}
-                                error={errors.password}
                             />
                             <Pressable 
                                 className="w-[15%] items-end justify-center"
@@ -82,7 +80,7 @@ export function SignIn() {
                         <TouchableOpacity 
                             className="flex justify-center items-center rounded-md bg-green_700 py-3 w-full" 
                             activeOpacity={0.8}
-                            onPress={() => handleSubmit(handleLogin)}
+                            onPress={handleSubmit(handleLogin)}
                         >
                             {
                                 loadingAuth ? (
