@@ -7,7 +7,7 @@ Aplicativo para montagem e acompanhamento de treino de musculação.
 
 ## Status
 
-Em Conclusão
+Concluído
 
 ## Funcionalidades
 
@@ -30,17 +30,13 @@ Em Conclusão
 - Fluxo de aplicação
 - Animações
 
-## Layout mobile
+## Layout
 
-<div style="display: flex; gap: 15px;">
-   <img src="https://github.com/devjoedson91/top-gym/blob/main/assets/signin.jpg" width="200" />
-   <img src="https://github.com/devjoedson91/top-gym/blob/main/assets/signup.jpg" width="200" />
-   <img src="https://github.com/devjoedson91/top-gym/blob/main/assets/home.jpg" width="200" />
-   <img src="https://github.com/devjoedson91/top-gym/blob/main/assets/exercise.jpg" width="200" />
-   <img src="https://github.com/devjoedson91/top-gym/blob/main/assets/webvideo.jpg" width="200" />
-   <img src="https://github.com/devjoedson91/top-gym/blob/main/assets/workout.jpg" width="200" />
-   <img src="https://github.com/devjoedson91/top-gym/blob/main/assets/perfil.jpg" width="200" />
-</div>
+### App Demo
+
+<a href="https://www.youtube.com/watch?v=ShipK4hXu1c&ab_channel=JoedsonFerreira" target="_blank">
+  <img src="https://github.com/devjoedson91/top-gym/blob/main/assets/signin.jpg" width="220" heght="220" />
+</a>
 
 # Tecnologias utilizadas
 ## Front end
@@ -51,14 +47,14 @@ Em Conclusão
 - Tailwind
 
 ## Back end
-- PHP
+- Node
 - Laravel
-- Mysql
+- Postgres
 
 ## Front end web
 Pré-requisitos: npm/yarn / node / expo-cli
 
-# Autor
+## Autor
 
 Joedson Ferreira
 
